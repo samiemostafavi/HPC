@@ -1,0 +1,7 @@
+EVENT NAME			MSIZE = 64 Naive	MSIZE = 64 Optimized	MSIZE = 1000 Naive	MSIZE = 1000 Optimized
+Elapsed time (seconds)		0,002518416		0,001907633		12,029204374		5,483919361
+Instructions per cycle		2,33			3,13			1,38			3,28
+L1 cache miss ratio		7,65%			1,87%			61,45%			6,28%
+L1 cache miss rate PTI		21,887909304		5,32235511		174,880333571		17,930580427
+LLC cache miss ratio		35,58%			4,79%			2,74%			7,35%
+LLC cache miss rate PTI		0,057682329		0,007238993		0,491220732		0,048030075
