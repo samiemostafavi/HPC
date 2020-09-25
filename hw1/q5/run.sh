@@ -1,6 +1,6 @@
 #!/bin/bash
 
-gcc -O3 -ftree-vectorize -fopt-info-vec-all matrix_multiply_1000.c -o matrix_multiply_1000.out
+gcc -O3 -ftree-vectorize -fopt-info-vec-missed matrix_multiply_1000.c -o matrix_multiply_1000.out
 
 echo "
 -ftree-vectorize
