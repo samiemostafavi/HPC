@@ -24,7 +24,7 @@ int main()
 	double t1,t2;
 	double total = 0.0;
 	double t[TRIALS];
-	int MAX_THREADS = omp_get_max_threads();
+	const int MAX_THREADS = omp_get_max_threads();
 
 	for (int j=0; j<TRIALS; j++)
 	{
