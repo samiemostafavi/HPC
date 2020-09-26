@@ -1,9 +1,9 @@
 #!/bin/bash
 
-echo "Question 2"
+echo "Question 2 part 1"
 
-gcc stream.c -fopenmp -o stream
-
+# RUN THIS BEFORE:
+# salloc --nodes=1 -t 01:00:00 -A edu20.FDD3258
 #-----------------------------------------
 
 echo "export OMP_NUM_THREADS=16"
@@ -13,7 +13,7 @@ c_num=0
 bw_arr=()
 for i in {1..5}
 do
-   my_array=( $(./stream | sed -n -e 14p -e 27p) )
+   my_array=( $(srun -n 1 ./stream | sed -n -e 14p -e 27p) )
    c_num=${my_array[5]}
    bw=${my_array[7]}
    echo "Number of cores: $c_num, bw: $bw"
@@ -41,7 +41,7 @@ do
    export OMP_NUM_THREADS=$n
    c_num=0
    bw_arr=()
-   my_array=( $(./stream | sed -n -e 14p -e 27p) )
+   my_array=( $(srun -n 1 ./stream | sed -n -e 14p -e 27p) )
    c_num=${my_array[5]}
    bw=${my_array[7]}
    echo "Number of cores: $c_num, bw: $bw"
