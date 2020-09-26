@@ -8,6 +8,13 @@
 #define N 1000000
 #define TRIALS 20
 
+struct tvals
+{
+	double val;
+	int loc;
+	char pad[128];
+};
+
 double mysecond()
 {
 	struct timeval tp;
@@ -40,31 +47,32 @@ int main()
 		t1 = mysecond();
 
 		// search for maxval
-		int maxloc[MAX_THREADS], mloc;
-		double maxval[MAX_THREADS], mval;
-		#pragma omp parallel shared(maxval,maxloc)
+		struct tvals maxinfo[MAX_THREADS];
+		double mval;
+		int mloc;
+		#pragma omp parallel shared(maxinfo)
 		{
 			int id = omp_get_thread_num();
-			maxval[id] = -1.0e30;
+			maxinfo[id].val = -1.0e30;
 
 			#pragma omp for
 			for (int i=0; i < N; i++)
 			{
-				if (x[i] > maxval[id])
+				if (x[i] > maxinfo[id].val)
 				{
-					maxval[id] = x[i]; 
-					maxloc[id] = i;
+					maxinfo[id].val = x[i]; 
+					maxinfo[id].loc = i;
 				}
 			}
 		}
-		mloc = maxloc[0];
-		mval = maxval[0];
+		mloc = maxinfo[0].loc;
+		mval = maxinfo[0].val;
 		for (int i=1; i < MAX_THREADS; i++)
                 {
-                        if (maxval[i] > mval)
+                        if (maxinfo[i].val > mval)
                         {
-                        	mval = maxval[i];
-                        	mloc = maxloc[i];
+                        	mval = maxinfo[i].val;
+                        	mloc = maxinfo[i].loc;
                 	}
                 }
 

@@ -19,15 +19,15 @@ do
 
 done
 
-#echo "thread sweep - maxloc_omp_critical -> "
+echo "thread sweep - maxloc_omp_padding -> "
 
-#num_thread_arr=(1 2 4 8 12 16 20 24 28 32)
-#for n in "${num_thread_arr[@]}"
-#do
-  # echo "export OMP_NUM_THREADS=$n"
-   #export OMP_NUM_THREADS=$n
-   #my_array=( $(srun -n 1 ./maxloc_omp_critical) )
-   #c_num=${my_array[3]}
-#   echo "Average: $c_num"
+num_thread_arr=(1 2 4 8 12 16 20 24 28 32)
+for n in "${num_thread_arr[@]}"
+do
+   echo "export OMP_NUM_THREADS=$n"
+   export OMP_NUM_THREADS=$n
+   my_array=( $(srun -n 1 ./maxloc_omp_padding) )
+   c_num=${my_array[3]}
+   echo "Average: $c_num"
 
-#done
+done
