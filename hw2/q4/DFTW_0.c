@@ -38,7 +38,7 @@ int printResults(double* xr, double* xi, int N);
 int main(int argc, char* argv[])
 {
 	  // size of input array
-	  int N = 8000; // 8,000 is a good number for testing
+	  int N = 10000; // 8,000 is a good number for testing
 	  printf("DFTW calculation with N = %d \n",N);
 	  
 	  // Allocate array for input vector
@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
 	  free(Xi_o); free(Xr_o);
 	  free(xr_check); free(xi_check);
 
-	  return 1;
+	  return 0;
 }
 
 // DFT/IDFT routine
