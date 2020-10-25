@@ -7,7 +7,7 @@
 #include <mpi.h>
 
 #define SEED     921
-#define NUM_ITER 16777216
+#define NUM_ITER 1000000000
 
 int calculate_pi_count(int num_iter, int seed)
 {
@@ -33,36 +33,35 @@ int calculate_pi_count(int num_iter, int seed)
 
 int main(int argc, char* argv[])
 {
-	int rank, size, provided,i;
+	int count, rank, size, provided;
+	int ocount = 0;
+	int* counts = NULL;
 	double t1,t2;
 	double pi;
 
   	MPI_Init_thread(&argc, &argv, MPI_THREAD_SINGLE, &provided);
  	MPI_Comm_size(MPI_COMM_WORLD, &size);
   	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	int count;
 
 	t1 = MPI_Wtime();
+	count = calculate_pi_count(NUM_ITER/size,time(NULL)+123456789+ rank*100);
+	if(rank==0)
+		counts = malloc(size * sizeof(int));
 	
-	// Make the calculation
-	count = calculate_pi_count(NUM_ITER/size, time(NULL)+123456789+ rank*100);
-  	
-	// Everybody is sending to rank 0
-  	if (rank == 0) {
-       		for (i=1; i<size; i++)  // note that we start from rank 1
-		{
-			int r_count = 0;
-             		MPI_Recv(&r_count, 1, MPI_INT, i, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			count += r_count;
-		}
-  	} else {
-    		MPI_Send(&count, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
+	MPI_Gather( &count, 1, MPI_INT, counts, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	
+	if(rank != 0)
+	{
   		MPI_Finalize();
-		return 0;
-  	}
+    		return 0;
+	}
+
+	// Sum of all counts
+	for(int j=0; j<size; ++j)
+		ocount += counts[j];
     	
 	// Estimate Pi and display the result
-    	pi = ((double)count / (double)NUM_ITER) * 4.0;
+    	pi = ((double)ocount / (double)NUM_ITER) * 4.0;
 	
 	t2 = MPI_Wtime();
     	printf("The result is %f, time elapsed: %f\n", pi, t2-t1);

@@ -33,38 +33,45 @@ int calculate_pi_count(int num_iter, int seed)
 
 int main(int argc, char* argv[])
 {
-	int rank, size, provided,i;
+	int real_rank, rank, real_size, size, provided,i;
 	double t1,t2;
 	double pi;
 
   	MPI_Init_thread(&argc, &argv, MPI_THREAD_SINGLE, &provided);
- 	MPI_Comm_size(MPI_COMM_WORLD, &size);
-  	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-	int count;
+ 	MPI_Comm_size(MPI_COMM_WORLD, &real_size);
+  	MPI_Comm_rank(MPI_COMM_WORLD, &real_rank);
+	size = real_size;
+	rank = real_rank;
 
 	t1 = MPI_Wtime();
+
+	// make the calculation	
+	int count = calculate_pi_count(NUM_ITER/real_size, time(NULL)+123456789+ real_rank*100);
 	
-	// Make the calculation
-	count = calculate_pi_count(NUM_ITER/size, time(NULL)+123456789+ rank*100);
-  	
-	// Everybody is sending to rank 0
-  	if (rank == 0) {
-       		for (i=1; i<size; i++)  // note that we start from rank 1
-		{
+	// tree height
+	i = 0;
+	// Check the size of active nodes
+	while(size > 1)
+	{
+  		// Everybody is sending to an even rank
+  		if (rank % 2 == 0) {
 			int r_count = 0;
-             		MPI_Recv(&r_count, 1, MPI_INT, i, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+             		MPI_Recv(&r_count, 1, MPI_INT, (rank+1)*(int)(pow(2,i)), 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 			count += r_count;
-		}
-  	} else {
-    		MPI_Send(&count, 1, MPI_INT, 0, 0, MPI_COMM_WORLD);
-  		MPI_Finalize();
-		return 0;
-  	}
-    	
+  		} else {
+    			MPI_Send(&count, 1, MPI_INT, (rank-1)*(int)(pow(2,i)), 0, MPI_COMM_WORLD);
+  			MPI_Finalize();
+			return 0;
+  		}
+		size = size / 2;
+		rank = rank / 2;
+		i++;
+	}
+	
 	// Estimate Pi and display the result
     	pi = ((double)count / (double)NUM_ITER) * 4.0;
-	
 	t2 = MPI_Wtime();
+
     	printf("The result is %f, time elapsed: %f\n", pi, t2-t1);
   	MPI_Finalize();
     	return 0;
